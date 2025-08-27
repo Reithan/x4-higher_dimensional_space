@@ -1,41 +1,66 @@
-# Compiled Lua sources
-luac.out
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+Desktop.ini
 
-# luarocks build files
-*.src.rock
-*.zip
-*.tar.gz
+# --- VSCode (keep useful project files) ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+!.vscode/launch.json
 
-# Object files
-*.o
-*.os
-*.ko
-*.obj
-*.elf
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-*.def
-*.exp
-
-# Shared objects (inc. Windows DLLs)
-*.dll
+# --- Python (tools/save-editor) ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
 *.so
-*.so.*
-*.dylib
+.env
+.env.*
+.venv*/
+venv*/
+env*/
+pip-wheel-metadata/
+*.egg-info/
+*.egg
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.cache/
+coverage.xml
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+# --- Lua/script artifacts ---
+*.luac
 
+# --- X4 mod build & packaging ---
+/release/
+build/
+out/
+*.zip
+*.7z
+
+# --- Logs / debug dumps ---
+*.log
+logs/
+debug/
+tmp/
+debug/*.csv   # if your harness exports CSV here
+
+# --- Example saves (large) ---
+saves/
+test_saves/
+!test_saves/fixtures/**
+*.xml.gz
+
+# --- Other IDEs (just in case) ---
+.idea/
+*.iml
+
+# --- OS temp ---
+*~
+.nfs*
