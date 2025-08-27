@@ -6,7 +6,7 @@ package.path = "./extensions/yvary/ui/addons/yvary/lua/?.lua;" .. package.path
 local mod = assert(require("yvary"), "require('yvary') failed")
 
 -- deterministic test RNG
-math.randomseed(0xC0FFEE)
+math.randomseed(0xC0FFEE) -- hex literal is fine in Lua 5.3+
 
 local function randf(a, b)
   return a + (b - a) * math.random()
@@ -17,17 +17,17 @@ local function assertf(cond, ...)
 end
 
 local function run_sector_case(case_id)
-  -- Randomize sector center and radius
-  local cx = randf(-50_000, 50_000)
-  local cz = randf(-50_000, 50_000)
-  local R  = randf(5_000, 120_000)              -- base sector "radius" in plane
+  -- Randomize sector center and radius (no underscores in numbers)
+  local cx = randf(-50000, 50000)
+  local cz = randf(-50000, 50000)
+  local R  = randf(5000, 120000)          -- base sector "radius" in plane
   local margin = 0.02
   local Rim = R * (1 + margin)
-  local save_seed = math.floor(randf(1, 2^31-1))
+  local save_seed = math.floor(randf(1, 2147483647)) -- 2^31-1
 
   -- 10 points per sector
   for i=1,10 do
-    -- 80%: inside R (guaranteed r < Rim), 20%: slightly beyond Rim (should be unchanged)
+    -- 80%: inside R; 20%: slightly beyond Rim (should be unchanged)
     local beyond = (math.random() < 0.2)
     local rmin, rmax
     if beyond then
@@ -40,9 +40,9 @@ local function run_sector_case(case_id)
     local r     = randf(rmin, rmax)
     local x     = cx + r * math.cos(theta)
     local z     = cz + r * math.sin(theta)
-    local y     = randf(-1000, 1000)            -- irrelevant when absolute=true
+    local y     = randf(-1000, 1000)      -- irrelevant when absolute=true
 
-    local obj_key = math.floor(randf(1, 2^31-1))
+    local obj_key = math.floor(randf(1, 2147483647))
     local x2,y2,z2 = mod.varyY(x,y,z, cx,cz, R, save_seed, obj_key, { absolute = true, margin = margin, q = 0.1 })
 
     -- Basic numeric checks (not NaN/inf)
