@@ -1,6 +1,6 @@
--- Higher Dimensional Space (Y-Var) — core mapper (no global RNG usage)
+-- Higher Dimensional Space — core mapper (no global RNG usage)
 
-local HDS = {}
+local HDS_YVARY = {}
 
 local function fract(x) return x - math.floor(x) end
 local function rand01_hash(a, b, c)
@@ -15,11 +15,11 @@ end
 --   save_seed    : integer-ish (game/save seed you read from save or config)
 --   obj_key      : stable integer-ish per object (macro+owner hash etc.)
 --   opts         : { absolute=true, margin=0.02, q=0.1 }
-function HDS.varyY(x,y,z, cx,cz, R, save_seed, obj_key, opts)
+function HDS_YVARY.varyY(x,y,z, cx,cz, R, save_seed, obj_key, opts)
   opts = opts or {}
   local absolute = (opts.absolute ~= false)
-  local margin = opts.margin or 0.02
-  local q = opts.q or 0.1
+  local margin   = opts.margin or 0.02
+  local q        = opts.q or 0.1
 
   local dx, dz = x - cx, z - cz
   local r = math.sqrt(dx*dx + dz*dz)
@@ -56,4 +56,4 @@ function HDS.varyY(x,y,z, cx,cz, R, save_seed, obj_key, opts)
   end
 end
 
-return HDS
+return HDS_YVARY

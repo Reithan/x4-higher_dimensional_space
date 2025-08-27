@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<content id="hds_yvar" name="Higher Dimensional Space (Y-Var)" version="0.1.0" author="Reithan" date="2025-08-26" save="false">
-  <text language="44" name="Higher Dimensional Space (Y-Var)"
-        description="Deterministic, seed-based Y-axis variation for NPC station/plot placement. Adds vertical sector depth." />
+<content id="hds_yvary" name="Higher Dimensional Space" version="0.1.0" author="Reithan" date="2025-08-26" save="false">
+  <text language="44" name="Higher Dimensional Space"
+        description="Deterministic, seed-based Y-axis variety for NPC station/plot placements. Includes a save editor." />
 </content>
