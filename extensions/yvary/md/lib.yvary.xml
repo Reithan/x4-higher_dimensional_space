@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mdscript name="lib.yvary">
+  <!-- Library placeholder. We’ll add cues/wrappers that call the Lua mapper
+       before AI site scoring in Step 5. Keeping this file present ensures the
+       extension validates/loads cleanly now. -->
+  <cues />
+</mdscript>
