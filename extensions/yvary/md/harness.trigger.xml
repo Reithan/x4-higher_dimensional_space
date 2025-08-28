@@ -18,7 +18,7 @@
     <cue name="HDSYV_Trigger_Line" checkinterval="1s">
       <conditions>
         <check_value value="md.hds_yvary_harness.HDSYV_Dev_Boot.$HDS_dev_anchor?"/>
-        <!-- <check_value value="false" comment="comment out to run"/> -->
+        <check_value value="false" comment="comment out to run"/>
       </conditions>
       <actions>
         <debug_text text="'[HDS] Trigger: Line'"/>

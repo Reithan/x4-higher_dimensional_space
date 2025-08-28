@@ -19,11 +19,16 @@
         <do_if value="not $HDS_dev_linepoints?"><set_value name="$HDS_dev_linepoints" exact="20"/></do_if>
         <do_if value="not $HDS_dev_R_default?"><set_value name="$HDS_dev_R_default" exact="120000"/></do_if>
 
+
+        <!-- center = sector.coreposition (fallback to 0,0 if absent) -->
+        <set_value name="$coreX" exact="0"/><do_if value="$sec.coreposition?"><set_value name="$coreX" exact="$sec.coreposition.x"/></do_if>
+        <set_value name="$coreZ" exact="0"/><do_if value="$sec.coreposition?"><set_value name="$coreZ" exact="$sec.coreposition.z"/></do_if>
+        
         <set_value name="$p"   exact="player.entity"/>
         <set_value name="$sec" exact="$p.sector"/>
-        <set_value name="$hx"  exact="$p.position.x + 5000"/>
-        <set_value name="$hy"  exact="$p.position.y"/>
-        <set_value name="$hz"  exact="$p.position.z"/>
+        <set_value name="$hx" exact="$coreX"/>
+        <set_value name="$hy" exact="0"/>
+        <set_value name="$hz" exact="$coreZ"/>
 
         <create_object name="$anchor" macro="macro.env_deco_nav_beacon_t1_macro" owner="faction.player" sector="$sec">
           <position x="$hx" y="$hy" z="$hz"/>
