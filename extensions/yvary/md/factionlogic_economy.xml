@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+
+  <!-- A) $BuildInSector branch: insert sphere pick; remove old polar RNG; drive safepos from value -->
+  <!-- Replace first polar selection line with RNG Sphere -->
+  <replace
+    sel="//do_if[@value='@$BuildInSector']//create_factory[.//select[@ware='$Ware']]/preceding-sibling::set_value[@name='$Yaw' and @min='0deg' and @max='360deg'][1]">
+    <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+      <param name="center" value="$RequestSector.coreposition"/>
+      <param name="R"      value="$SectorCoreSize"/>
+      <param name="squash" value="0.60f"/>
+    </run_actions>
+  </replace>
+
+  <!-- Remove the remaining polar RNG lines -->
+  <remove sel="//do_if[@value='@$BuildInSector']//create_factory[.//select[@ware='$Ware']]/preceding-sibling::set_value[@name='$Y' and contains(@min,'$SectorCentre.y') and contains(@max,'$SectorCentre.y')][1]"/>
+  <remove sel="//do_if[@value='@$BuildInSector']//create_factory[.//select[@ware='$Ware']]/preceding-sibling::set_value[@name='$PlacementDist' and @min='0km' and @max='$SectorCoreSize' and @profile='bell' and @scale='2'][1]"/>
+
+  <!-- Replace safepos XYZ with value="$Position" (keep includeplotbox/radius) -->
+  <replace sel="//do_if[@value='@$BuildInSector']//create_factory[.//select[@ware='$Ware']]/safepos[@x and @y and @z and contains(@x,'$SectorCentre.x') and @y='$Y' and contains(@z,'$SectorCentre.z') and @radius='3km']">
+    <safepos value="$Position" includeplotbox="true" radius="3km"/>
+  </replace>
+
+  <!-- B) Else branch: add sphere pick before the 40km scatter; switch safepos to value="$Position" -->
+  <!-- Insert RNG right before the existing safepos with max="40km" -->
+  <add
+    sel="//do_else[preceding-sibling::do_if[@value='@$BuildInSector']]//create_factory[.//select[@ware='$Ware']]/safepos[@max='40km' and @includeplotbox='true' and @radius='3km'][1]"
+    pos="before">
+    <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+      <param name="center" value="$RequestSector.coreposition"/>
+      <param name="R"      value="40km"/>
+      <param name="squash" value="1.0f"/>
+    </run_actions>
+  </add>
+
+  <!-- Replace the wide safepos with one that uses our picked position -->
+  <replace sel="//do_else[preceding-sibling::do_if[@value='@$BuildInSector']]//create_factory[.//select[@ware='$Ware']]/safepos[@max='40km' and @includeplotbox='true' and @radius='3km'][1]">
+    <safepos value="$Position" includeplotbox="true" radius="3km"/>
+  </replace>
+
+</diff>

@@ -1,147 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mdscript name="hds_yvary_harness">
-  <cues>
+    <cues>
 
-    <!-- Boot once: drop an anchor so we know the harness is alive -->
-    <cue name="HDSYV_Dev_Boot" checkinterval="5s">
-      <conditions>
-        <check_value value="player.entity != null"/>
-        <check_value value="player.entity.sector != null"/>
-        <check_value value="not $HDS_dev_anchor?"/>
-      </conditions>
-      <actions>
-        <!-- defaults -->
-        <do_if value="not $HDS_dev_margin?"><set_value name="$HDS_dev_margin" exact="0.02"/></do_if>
-        <do_if value="not $HDS_dev_q?"><set_value name="$HDS_dev_q" exact="0.1"/></do_if>
-        <do_if value="not $HDS_dev_absolute?"><set_value name="$HDS_dev_absolute" exact="true"/></do_if>
-        <do_if value="not $HDS_dev_samples?"><set_value name="$HDS_dev_samples" exact="24"/></do_if>
-        <do_if value="not $HDS_dev_rings?"><set_value name="$HDS_dev_rings" exact="3"/></do_if>
-        <do_if value="not $HDS_dev_linepoints?"><set_value name="$HDS_dev_linepoints" exact="20"/></do_if>
-        <do_if value="not $HDS_dev_R_default?"><set_value name="$HDS_dev_R_default" exact="120000"/></do_if>
+        <!-- Boot once: drop an anchor so we know the harness is alive -->
+        <cue name="HDSYV_Dev_Boot" checkinterval="5s">
+            <conditions>
+                <check_value value="player.entity != null" />
+                <check_value value="player.entity.sector != null" />
+                <check_value value="not $HDS_dev_anchor?" />
+            </conditions>
+            <actions>
+                <!-- defaults -->
+                <do_if value="not $HDS_dev_margin?">
+                    <set_value name="$HDS_dev_margin" exact="0.02" />
+                </do_if>
+                <do_if value="not $HDS_dev_q?">
+                    <set_value name="$HDS_dev_q" exact="0.1" />
+                </do_if>
+                <do_if value="not $HDS_dev_absolute?">
+                    <set_value name="$HDS_dev_absolute" exact="true" />
+                </do_if>
+                <do_if value="not $HDS_dev_samples?">
+                    <set_value name="$HDS_dev_samples" exact="24" />
+                </do_if>
+                <do_if value="not $HDS_dev_rings?">
+                    <set_value name="$HDS_dev_rings" exact="3" />
+                </do_if>
+                <do_if value="not $HDS_dev_linepoints?">
+                    <set_value name="$HDS_dev_linepoints" exact="20" />
+                </do_if>
+                <do_if value="not $HDS_dev_R_default?">
+                    <set_value name="$HDS_dev_R_default" exact="120000" />
+                </do_if>
 
 
-        <!-- center = sector.coreposition (fallback to 0,0 if absent) -->
-        <set_value name="$coreX" exact="0"/><do_if value="$sec.coreposition?"><set_value name="$coreX" exact="$sec.coreposition.x"/></do_if>
-        <set_value name="$coreZ" exact="0"/><do_if value="$sec.coreposition?"><set_value name="$coreZ" exact="$sec.coreposition.z"/></do_if>
-        
-        <set_value name="$p"   exact="player.entity"/>
-        <set_value name="$sec" exact="$p.sector"/>
-        <set_value name="$hx" exact="$coreX"/>
-        <set_value name="$hy" exact="0"/>
-        <set_value name="$hz" exact="$coreZ"/>
+                <!-- center = sector.coreposition (fallback to 0,0 if absent) -->
+                <set_value name="$coreX" exact="0" />
+                <do_if value="$sec.coreposition?">
+                    <set_value name="$coreX" exact="$sec.coreposition.x" />
+                </do_if>
+                <set_value name="$coreZ" exact="0" />
+                <do_if value="$sec.coreposition?">
+                    <set_value name="$coreZ" exact="$sec.coreposition.z" />
+                </do_if>
 
-        <create_object name="$anchor" macro="macro.env_deco_nav_beacon_t1_macro" owner="faction.player" sector="$sec">
-          <position x="$hx" y="$hy" z="$hz"/>
-        </create_object>
-        <set_known object="$anchor" known="true"/>
-        <set_value name="$HDS_dev_anchor" exact="$anchor"/>
-        <debug_text text="'[HDS] Harness anchor spawned in ' + $sec.name"/>
-      </actions>
+                <set_value name="$p" exact="player.entity" />
+                <set_value name="$sec" exact="$p.sector" />
+                <set_value name="$hx" exact="$coreX" />
+                <set_value name="$hy" exact="0" />
+                <set_value name="$hz" exact="$coreZ" />
 
-      <!-- Listeners live while Boot is active -->
-      <cues>
-
-        <!-- RING -->
-        <cue name="HDSYV_Dev_RunSample">
-          <conditions><event_cue_signalled/></conditions>
-          <actions>
-            <set_value name="$sec" exact="player.entity.sector"/>
-            <set_value name="$cx" exact="0"/><set_value name="$cz" exact="0"/>
-            <set_value name="$R"  exact="$HDS_dev_R_default"/>
-
-            <!-- clear -->
-            <do_if value="$HDS_dev_markers?">
-              <set_value name="$i" exact="1"/>
-              <do_while value="$i le $HDS_dev_markers.count">
-                <set_value name="$m" exact="$HDS_dev_markers.{$i}"/>
-                <do_if value="$m != null"><destroy_object object="$m"/></do_if>
-                <set_value name="$i" exact="$i + 1"/>
-              </do_while>
-            </do_if>
-            <set_value name="$HDS_dev_markers" exact="[]"/>
-
-            <set_value name="$ringcount" exact="$HDS_dev_rings"/>
-            <set_value name="$den" exact="$ringcount"/><do_if value="$den lt 1"><set_value name="$den" exact="1"/></do_if>
-            <set_value name="$perring" exact="$HDS_dev_samples / $den"/><do_if value="$perring lt 1"><set_value name="$perring" exact="1"/></do_if>
-
-            <set_value name="$ring" exact="0"/>
-            <do_while value="$ring lt $ringcount">
-              <set_value name="$ring" exact="$ring + 1"/>
-              <set_value name="$i"    exact="0"/>
-              <do_while value="$i lt $perring">
-                <set_value name="$i" exact="$i + 1"/>
-                <set_value name="$theta" exact="(2*3.141592653589793) * (($i - 1) / $perring)"/>
-                <set_value name="$rr"    exact="$R * ($ring / $ringcount)"/>
-                <set_value name="$x"     exact="$cx + $rr * cos($theta)"/>
-                <set_value name="$z"     exact="$cz + $rr * sin($theta)"/>
-                <set_value name="$y"     exact="0"/>
-
-                <!-- call varyY synchronously via run_actions -->
-                <run_actions ref="md.hds_yvary_lib.HDSYV_VaryY">
-                  <param name="x"          value="$x"/>
-                  <param name="y"          value="$y"/>
-                  <param name="z"          value="$z"/>
-                  <param name="cx"         value="$cx"/>
-                  <param name="cz"         value="$cz"/>
-                  <param name="R"          value="$R"/>
-                  <param name="margin"     value="$HDS_dev_margin"/>
-                  <param name="q"          value="$HDS_dev_q"/>
-                  <param name="absolute"   value="$HDS_dev_absolute"/>
-                  <param name="save_seed"  value="0"/>
-                  <param name="obj_key"    value="($ring*1000 + $i)"/>
-                </run_actions>
-
-                <create_object name="$m" macro="macro.env_deco_nav_beacon_t1_macro" owner="faction.player" sector="$sec">
-                  <position x="$out_x" y="$out_y" z="$out_z"/>
+                <create_object name="$anchor" macro="macro.env_deco_nav_beacon_t1_macro"
+                    owner="faction.player" sector="$sec">
+                    <position x="$hx" y="$hy" z="$hz" />
                 </create_object>
-                <set_known object="$m" known="true"/>
-                <append_to_list name="$HDS_dev_markers" exact="$m"/>
-              </do_while>
-            </do_while>
+                <set_known object="$anchor" known="true" />
+                <set_value name="$HDS_dev_anchor" exact="$anchor" />
+                <debug_text text="'[HDS] Harness anchor spawned in ' + $sec.name" />
+            </actions>
 
-            <debug_text text="'[HDS] Ring sample done in ' + $sec.name"/>
-          </actions>
-        </cue>
+            <!-- Listeners live while Boot is active -->
+            <cues>
 
-        <!-- LINE: draw a straight line across the sector core (no varyY yet) -->
-        <cue name="HDSYV_Dev_Line_Current">
-        <conditions><event_cue_signalled/></conditions>
-        <actions>
-            <!-- Context -->
-            <set_value name="$sector" exact="player.entity.sector"/>
+                <!-- RING -->
+                <cue name="HDSYV_Dev_RunSample">
+                    <conditions>
+                        <event_cue_signalled />
+                    </conditions>
+                    <actions>
+                        <set_value name="$sec" exact="player.entity.sector" />
+                        <set_value name="$cx" exact="0" />
+                        <set_value name="$cz" exact="0" />
+                        <set_value name="$R" exact="$HDS_dev_R_default" />
 
-            <!-- Core center; fall back to (0, 0) if unknown -->
-            <set_value name="$centerX" exact="0"/><do_if value="$sector.coreposition?"><set_value name="$centerX" exact="$sector.coreposition.x"/></do_if>
-            <set_value name="$centerZ" exact="0"/><do_if value="$sector.coreposition?"><set_value name="$centerZ" exact="$sector.coreposition.z"/></do_if>
+                        <!-- clear -->
+                        <do_if value="$HDS_dev_markers?">
+                            <set_value name="$i" exact="1" />
+                            <do_while value="$i le $HDS_dev_markers.count">
+                                <set_value name="$m" exact="$HDS_dev_markers.{$i}" />
+                                <do_if value="$m != null">
+                                    <destroy_object object="$m" />
+                                </do_if>
+                                <set_value name="$i" exact="$i + 1" />
+                            </do_while>
+                        </do_if>
+                        <set_value name="$HDS_dev_markers" exact="[]" />
 
-            <!-- Core diameter → radius; fall back to harness default if missing or <= 0 -->
-            <set_value name="$coreDiam" exact="0"/><do_if value="$sector.coresize?"><set_value name="$coreDiam" exact="$sector.coresize"/></do_if>
-            <set_value name="$radiusFromCore" exact="$coreDiam / 2.0"/>
-            <set_value name="$radius" exact="[ $radiusFromCore, $HDS_dev_R_default ].max"/>
+                        <set_value name="$ringcount" exact="$HDS_dev_rings" />
+                        <set_value name="$den" exact="$ringcount" />
+                        <do_if value="$den lt 1">
+                            <set_value name="$den" exact="1" />
+                        </do_if>
+                        <set_value name="$perring" exact="$HDS_dev_samples / $den" />
+                        <do_if value="$perring lt 1">
+                            <set_value name="$perring" exact="1" />
+                        </do_if>
 
-            <!-- Count: at least 20 points -->
-            <set_value name="$requested" exact="$HDS_dev_linepoints"/>
-            <set_value name="$pointCount" exact="[ $requested, 20 ].max"/>
+                        <set_value name="$ring" exact="0" />
+                        <do_while value="$ring lt $ringcount">
+                            <set_value name="$ring" exact="$ring + 1" />
+                            <set_value name="$i" exact="0" />
+                            <do_while value="$i lt $perring">
+                                <set_value name="$i" exact="$i + 1" />
+                                <set_value name="$theta"
+                                    exact="(2*3.141592653589793) * (($i - 1) / $perring)" />
+                                <set_value name="$rr" exact="$R * ($ring / $ringcount)" />
+                                <set_value name="$x" exact="$cx + $rr * cos($theta)" />
+                                <set_value name="$z" exact="$cz + $rr * sin($theta)" />
+                                <set_value name="$y" exact="0" />
 
-            <!-- Endpoints: [-R, +R] across X at Z=centerZ, Y=0 -->
-            <set_value name="$startX" exact="$centerX - $radius"/>
-            <set_value name="$endX"   exact="$centerX + $radius"/>
-            <set_value name="$fixedZ" exact="$centerZ"/>
-            <set_value name="$fixedY" exact="0"/>
+                                <!-- call varyY synchronously via run_actions -->
+                                <run_actions ref="md.hds_yvary_lib.HDSYV_VaryY">
+                                    <param name="x" value="$x" />
+                                    <param name="y" value="$y" />
+                                    <param name="z" value="$z" />
+                                    <param name="cx" value="$cx" />
+                                    <param name="cz" value="$cz" />
+                                    <param name="R" value="$R" />
+                                    <param name="margin" value="$HDS_dev_margin" />
+                                    <param name="q" value="$HDS_dev_q" />
+                                    <param name="absolute" value="$HDS_dev_absolute" />
+                                    <param name="save_seed" value="0" />
+                                    <param name="obj_key" value="($ring*1000 + $i)" />
+                                </run_actions>
 
-            <!-- Reset line list -->
-            <set_value name="$HDS_dev_line" exact="[]"/>
+                                <create_object name="$m" macro="macro.env_deco_nav_beacon_t1_macro"
+                                    owner="faction.player" sector="$sec">
+                                    <position x="$out_x" y="$out_y" z="$out_z" />
+                                </create_object>
+                                <set_known object="$m" known="true" />
+                                <append_to_list name="$HDS_dev_markers" exact="$m" />
+                            </do_while>
+                        </do_while>
 
-            <!-- Even spacing: force FLOAT division so t ∈ [0..1] properly -->
-            <do_all exact="$pointCount" counter="$idx">
-            <set_value name="$t" exact="($idx - 1.0) / ($pointCount - 1.0)"/>
+                        <debug_text text="'[HDS] Ring sample done in ' + $sec.name" />
+                    </actions>
+                </cue>
 
-            <!-- Lerp -->
-            <set_value name="$xPos" exact="$startX + $t * ($endX - $startX)"/>
-            <set_value name="$yPos" exact="$fixedY"/>
-            <set_value name="$zPos" exact="$fixedZ"/>
+                <!-- LINE: draw a straight line across the sector core (no varyY yet) -->
+                <cue name="HDSYV_Dev_Line_Current">
+                    <conditions>
+                        <event_cue_signalled />
+                    </conditions>
+                    <actions>
+                        <!-- Context -->
+                        <set_value name="$sector" exact="player.entity.sector" />
 
-            <!-- (Temporarily skip varyY for visual validation)
+                        <!-- Core center; fall back to (0, 0) if unknown -->
+                        <set_value name="$centerX" exact="0" />
+                        <do_if value="$sector.coreposition?">
+                            <set_value name="$centerX" exact="$sector.coreposition.x" />
+                        </do_if>
+                        <set_value name="$centerZ" exact="0" />
+                        <do_if value="$sector.coreposition?">
+                            <set_value name="$centerZ" exact="$sector.coreposition.z" />
+                        </do_if>
+
+                        <!-- Core diameter → radius; fall back to harness default if missing or <= 0 -->
+                        <set_value name="$coreDiam" exact="0" />
+                        <do_if value="$sector.coresize?">
+                            <set_value name="$coreDiam" exact="$sector.coresize" />
+                        </do_if>
+                        <set_value name="$radiusFromCore" exact="$coreDiam / 2.0" />
+                        <set_value name="$radius"
+                            exact="[ $radiusFromCore, $HDS_dev_R_default ].max" />
+
+                        <!-- Count: at least 20 points -->
+                        <set_value name="$requested" exact="$HDS_dev_linepoints" />
+                        <set_value name="$pointCount" exact="[ $requested, 20 ].max" />
+
+                        <!-- Endpoints: [-R, +R] across X at Z=centerZ, Y=0 -->
+                        <set_value name="$startX" exact="$centerX - $radius" />
+                        <set_value name="$endX" exact="$centerX + $radius" />
+                        <set_value name="$fixedZ" exact="$centerZ" />
+                        <set_value name="$fixedY" exact="0" />
+
+                        <!-- Reset line list -->
+                        <set_value name="$HDS_dev_line" exact="[]" />
+
+                        <!-- Even spacing: force FLOAT division so t ∈ [0..1] properly -->
+                        <do_all exact="$pointCount" counter="$idx">
+                            <set_value name="$t" exact="($idx - 1.0) / ($pointCount - 1.0)" />
+
+                            <!-- Lerp -->
+                            <set_value name="$xPos" exact="$startX + $t * ($endX - $startX)" />
+                            <set_value name="$yPos" exact="$fixedY" />
+                            <set_value name="$zPos" exact="$fixedZ" />
+
+                            <!-- (Temporarily skip varyY for visual validation)
             <run_actions ref="md.hds_yvary_lib.HDSYV_VaryY">
                 <param name="x"          value="$xPos"/>
                 <param name="y"          value="$yPos"/>
@@ -157,60 +203,136 @@
             </run_actions>
             -->
 
-            <!-- Place the beacon at the exact test position (units: engine treats lengths as meters; explicit km OK too) -->
-            <create_object name="$beacon" macro="macro.env_deco_nav_beacon_t1_macro" owner="faction.player" sector="$sector">
-                <position x="$xPos" y="$yPos" z="$zPos"/>
-                <!-- If you prefer safer placement during tests, swap the line above for:
+                            <!-- Place the beacon at the exact test position (units: engine treats
+                            lengths as meters; explicit km OK too) -->
+                            <create_object name="$beacon" macro="macro.env_deco_nav_beacon_t1_macro"
+                                owner="faction.player" sector="$sector">
+                                <position x="$xPos" y="$yPos" z="$zPos" />
+                                <!-- If you prefer safer placement during tests, swap the line above
+                                for:
                     <safepos value="position[$xPos, $yPos, $zPos]" max="2km"/>
                     (Note: safepos may nudge positions, so keep it off while validating a straight line.)
                 -->
-            </create_object>
-            <set_known object="$beacon" known="true"/>
-            <append_to_list name="$HDS_dev_line" exact="$beacon"/>
-            </do_all>
+                            </create_object>
+                            <set_known object="$beacon" known="true" />
+                            <append_to_list name="$HDS_dev_line" exact="$beacon" />
+                        </do_all>
 
-            <append_to_list name="$HDS_dev_lines" exact="$HDS_dev_line"/>
+                        <append_to_list name="$HDS_dev_lines" exact="$HDS_dev_line" />
 
-            <debug_text text="'[HDS] Line: ' + $pointCount + ' beacons; center=(' + $centerX + ',' + $centerZ + '), R=' + $radius"/>
-        </actions>
+                        <debug_text
+                            text="'[HDS] Line: ' + $pointCount + ' beacons; center=(' + $centerX + ',' + $centerZ + '), R=' + $radius" />
+                    </actions>
+                </cue>
+
+                <!-- CLOUD: 50 random beacons using sphere RNG (center = sector core, radius =
+                sector core radius), squash = 0.60 -->
+                <cue name="HDSYV_Dev_Sphere_Cloud">
+                    <conditions>
+                        <event_cue_signalled />
+                    </conditions>
+                    <actions>
+                        <!-- Context -->
+                        <set_value name="$sector" exact="player.entity.sector" />
+
+                        <!-- Core center; fall back to (0, 0) if unknown -->
+                        <set_value name="$centerX" exact="0" />
+                        <do_if value="$sector.coreposition?">
+                            <set_value name="$centerX" exact="$sector.coreposition.x" />
+                        </do_if>
+                        <set_value name="$centerZ" exact="0" />
+                        <do_if value="$sector.coreposition?">
+                            <set_value name="$centerZ" exact="$sector.coreposition.z" />
+                        </do_if>
+
+                        <!-- Core diameter → radius; fall back to harness default if missing or <= 0 -->
+                        <set_value name="$coreDiam" exact="0" />
+                        <do_if value="$sector.coresize?">
+                            <set_value name="$coreDiam" exact="$sector.coresize" />
+                        </do_if>
+                        <set_value name="$radiusFromCore" exact="$coreDiam / 2.0" />
+                        <set_value name="$radius"
+                            exact="[ $radiusFromCore, $HDS_dev_R_default ].max" />
+
+                        <!-- Count -->
+                        <set_value name="$count" exact="50" />
+
+                        <!-- Clear markers (reuse harness cleanup) -->
+                        <do_if value="$HDS_dev_markers?">
+                            <set_value name="$i" exact="1" />
+                            <do_while value="$i le $HDS_dev_markers.count">
+                                <set_value name="$m" exact="$HDS_dev_markers.{$i}" />
+                                <do_if value="$m != null">
+                                    <destroy_object object="$m" />
+                                </do_if>
+                                <set_value name="$i" exact="$i + 1" />
+                            </do_while>
+                        </do_if>
+                        <set_value name="$HDS_dev_markers" exact="[]" />
+
+                        <!-- Sample & spawn -->
+                        <do_all exact="$count" counter="$idx">
+                            <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$pos">
+                                <param name="center" value="position.[$centerX, 0, $centerZ]" />
+                                <param name="R" value="$radius" />
+                                <param name="squash" value="0.60" />
+                            </run_actions>
+
+                            <create_object name="$b" macro="macro.env_deco_nav_beacon_t1_macro"
+                                owner="faction.player" sector="$sector">
+                                <safepos value="$pos" allowyaxis="true" radius="1km"
+                                    includeplotbox="true" />
+                            </create_object>
+                            <set_known object="$b" known="true" />
+                            <append_to_list name="$HDS_dev_markers" exact="$b" />
+                        </do_all>
+
+                        <debug_text
+                            text="'[HDS] Cloud: ' + $count + ' beacons; center=(' + $centerX + ',' + $centerZ + '), R=' + $radius + ', squash=0.60'" />
+                    </actions>
+                </cue>
+
+                <!-- CLEANUP -->
+                <cue name="HDSYV_Dev_Cleanup">
+                    <conditions>
+                        <event_cue_signalled />
+                    </conditions>
+                    <actions>
+                        <do_if value="$HDS_dev_markers?">
+                            <set_value name="$i" exact="1" />
+                            <do_while value="$i le $HDS_dev_markers.count">
+                                <set_value name="$m" exact="$HDS_dev_markers.{$i}" />
+                                <do_if value="$m != null">
+                                    <destroy_object object="$m" />
+                                </do_if>
+                                <set_value name="$i" exact="$i + 1" />
+                            </do_while>
+                        </do_if>
+                        <set_value name="$HDS_dev_markers" exact="[]" />
+
+                        <do_if value="$HDS_dev_lines?">
+                            <set_value name="$li" exact="1" />
+                            <do_while value="$li le $HDS_dev_lines.count">
+                                <set_value name="$ln" exact="$HDS_dev_lines.{$li}" />
+                                <set_value name="$bi" exact="1" />
+                                <do_while value="$bi le $ln.count">
+                                    <set_value name="$b" exact="$ln.{$bi}" />
+                                    <do_if value="$b != null">
+                                        <destroy_object object="$b" />
+                                    </do_if>
+                                    <set_value name="$bi" exact="$bi + 1" />
+                                </do_while>
+                                <set_value name="$li" exact="$li + 1" />
+                            </do_while>
+                        </do_if>
+                        <set_value name="$HDS_dev_lines" exact="[]" />
+
+                        <debug_text text="'[HDS] Cleaned up'" />
+                    </actions>
+                </cue>
+
+            </cues>
         </cue>
 
-
-        <!-- CLEANUP -->
-        <cue name="HDSYV_Dev_Cleanup">
-          <conditions><event_cue_signalled/></conditions>
-          <actions>
-            <do_if value="$HDS_dev_markers?">
-              <set_value name="$i" exact="1"/>
-              <do_while value="$i le $HDS_dev_markers.count">
-                <set_value name="$m" exact="$HDS_dev_markers.{$i}"/>
-                <do_if value="$m != null"><destroy_object object="$m"/></do_if>
-                <set_value name="$i" exact="$i + 1"/>
-              </do_while>
-            </do_if>
-            <set_value name="$HDS_dev_markers" exact="[]"/>
-
-            <do_if value="$HDS_dev_lines?">
-              <set_value name="$li" exact="1"/>
-              <do_while value="$li le $HDS_dev_lines.count">
-                <set_value name="$ln" exact="$HDS_dev_lines.{$li}"/>
-                <set_value name="$bi" exact="1"/>
-                <do_while value="$bi le $ln.count">
-                  <set_value name="$b" exact="$ln.{$bi}"/>
-                  <do_if value="$b != null"><destroy_object object="$b"/></do_if>
-                  <set_value name="$bi" exact="$bi + 1"/>
-                </do_while>
-                <set_value name="$li" exact="$li + 1"/>
-              </do_while>
-            </do_if>
-            <set_value name="$HDS_dev_lines" exact="[]"/>
-
-            <debug_text text="'[HDS] Cleaned up'"/>
-          </actions>
-        </cue>
-
-      </cues>
-    </cue>
-
-  </cues>
+    </cues>
 </mdscript>

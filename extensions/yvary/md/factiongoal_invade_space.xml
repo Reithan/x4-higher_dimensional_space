@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+
+  <!-- A) Prepare phase → BuildStation (no fixed Z) -->
+  <add
+    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and not(@z)][1]"
+    pos="before">
+    <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$SpherePos">
+      <param name="center" value="$NewSubgoalTable.$EntryPoint.destination"/>
+      <param name="R"      value="10km"/>
+      <param name="squash" value="1.0f"/>
+    </run_actions>
+  </add>
+
+  <replace
+    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and not(@z)][1]">
+    <get_safe_pos result="$NewSubgoalTable.$Position"
+                  sector="$NewSubgoalTable.$Target"
+                  value="$SpherePos"
+                  radius="5km"
+                  includeplotbox="true"/>
+  </replace>
+
+  <!-- B) Beachhead phase → BuildStation (preserve z='5km') -->
+  <add
+    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and @z='5km'][1]"
+    pos="before">
+    <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$SpherePos">
+      <param name="center" value="$NewSubgoalTable.$EntryPoint.destination"/>
+      <param name="R"      value="10km"/>
+      <param name="squash" value="1.0f"/>
+    </run_actions>
+  </add>
+
+  <replace
+    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and @z='5km'][1]">
+    <get_safe_pos result="$NewSubgoalTable.$Position"
+                  sector="$NewSubgoalTable.$Target"
+                  value="$SpherePos"
+                  radius="5km"
+                  z="5km"
+                  includeplotbox="true"/>
+  </replace>
+
+</diff>

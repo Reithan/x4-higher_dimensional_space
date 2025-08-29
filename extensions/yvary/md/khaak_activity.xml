@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+
+    <!-- 1) Hive station: replace polar RNG with sphere RNG; feed safepos from $Position (keep
+    includeplotbox only) -->
+    <replace
+        sel="//create_station[@macro='macro.landmarks_kha_hive_01_macro']/preceding-sibling::set_value[@name='$Yaw'][1]">
+        <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+            <param name="center" value="$SectorCentre" />
+            <param name="Rmin" value="this.$NewSector.coresize / 2.0f + 170km" />
+            <param name="R" value="this.$NewSector.coresize / 2.0f + 190km" />
+            <param name="squash" value="0.60f" />
+        </run_actions>
+    </replace>
+    <remove
+        sel="//create_station[@macro='macro.landmarks_kha_hive_01_macro']/preceding-sibling::set_value[@name='$Y' and contains(@min,'$SectorCentre.y')][1]" />
+    <remove
+        sel="//create_station[@macro='macro.landmarks_kha_hive_01_macro']/preceding-sibling::set_value[@name='$PlacementDist'][1]" />
+    <replace sel="//create_station[@macro='macro.landmarks_kha_hive_01_macro']/safepos">
+        <safepos value="$Position" includeplotbox="true" />
+    </replace>
+
+    <!-- 2) Defence platforms ring: seed from RNG (center=hive pos; annulus via Rmin/R); keep
+    space/ignored/includefiringrange/includeplotbox, drop min/max -->
+    <add
+        sel="//safepos[@value='this.$StationSectorPos' and @space='this.$NewSector' and @min='9050m' and @max='9200m']/parent::create_station"
+        pos="before">
+        <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+            <param name="center" value="this.$StationSectorPos" />
+            <param name="Rmin" value="9050m" />
+            <param name="R" value="9200m" />
+            <param name="squash" value="1.0f" />
+        </run_actions>
+    </add>
+    <replace
+        sel="//safepos[@value='this.$StationSectorPos' and @space='this.$NewSector' and @min='9050m' and @max='9200m']">
+        <safepos value="$Position" space="this.$NewSector" ignored="this.$NewStation"
+            includefiringrange="false" includeplotbox="false" />
+    </replace>
+
+    <!-- 3) Outpost station: replace polar RNG with sphere RNG; feed safepos from $Position (keep
+    includeplotbox only) -->
+    <replace
+        sel="//create_station[@macro='macro.landmarks_kha_nest_01_macro']/preceding-sibling::set_value[@name='$Yaw'][1]">
+        <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+            <param name="center" value="$SectorCentre" />
+            <param name="Rmin" value="this.$SelectedSector.coresize / 2.0f + 140km" />
+            <param name="R" value="this.$SelectedSector.coresize / 2.0f + 180km" />
+            <param name="squash" value="0.60f" />
+        </run_actions>
+    </replace>
+    <remove
+        sel="//create_station[@macro='macro.landmarks_kha_nest_01_macro']/preceding-sibling::set_value[@name='$Yaw'][1]" />
+    <remove
+        sel="//create_station[@macro='macro.landmarks_kha_nest_01_macro']/preceding-sibling::set_value[@name='$Y' and contains(@min,'$SectorCentre.y')][1]" />
+    <remove
+        sel="//create_station[@macro='macro_landmarks_kha_nest_01_macro' or @macro='macro.landmarks_kha_nest_01_macro']/preceding-sibling::set_value[@name='$PlacementDist'][1]" />
+    <replace sel="//create_station[@macro='macro.landmarks_kha_nest_01_macro']/safepos">
+        <safepos value="$Position" includeplotbox="true" />
+    </replace>
+
+</diff>
