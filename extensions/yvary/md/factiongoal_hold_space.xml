@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+
+  <!-- 1) High-tech factory: insert sphere pick before the old polar RNG, then remove the three RNG lines -->
+  <replace sel="//create_factory[.//select[@ware='$HightechWare']]/preceding-sibling::set_value[@name='$Yaw' and @min='0deg' and @max='360deg'][1]">
+    <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+      <param name="center" value="$SectorCentre"/>
+      <param name="R"      value="$SectorCoreSize"/>
+      <param name="squash" value="0.60f"/>
+    </run_actions>
+  </replace>
+  <remove sel="//create_factory[.//select[@ware='$HightechWare']]/preceding-sibling::set_value[@name='$Y' and contains(@min,'$SectorCentre.y') and contains(@max,'$SectorCentre.y')][1]"/>
+  <remove sel="//create_factory[.//select[@ware='$HightechWare']]/preceding-sibling::set_value[@name='$PlacementDist' and @min='0km' and @max='$SectorCoreSize' and @profile='bell' and @scale='2'][1]"/>
+
+  <!-- Replace the safepos XYZ with value="$Position" for the same High-tech create_factory -->
+  <replace sel="//create_factory[.//select[@ware='$HightechWare']]/safepos[@x and @y and @z and contains(@x,'$SectorCentre.x') and @y='$Y' and contains(@z,'$SectorCentre.z')]">
+    <safepos value="$Position" includeplotbox="true"/>
+  </replace>
+
+  <!-- 2) Low-tech factory: same pattern (insert pick, remove three RNG lines, switch safepos) -->
+  <replace sel="//create_factory[.//select[@ware='$LowtechWare']]/preceding-sibling::set_value[@name='$Yaw' and @min='0deg' and @max='360deg'][1]">
+    <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+      <param name="center" value="$SectorCentre"/>
+      <param name="R"      value="$SectorCoreSize"/>
+      <param name="squash" value="0.60f"/>
+    </run_actions>
+  </replace>
+  <remove sel="//create_factory[.//select[@ware='$LowtechWare']]/preceding-sibling::set_value[@name='$Y' and contains(@min,'$SectorCentre.y') and contains(@max,'$SectorCentre.y')][1]"/>
+  <remove sel="//create_factory[.//select[@ware='$LowtechWare']]/preceding-sibling::set_value[@name='$PlacementDist' and @min='0km' and @max='$SectorCoreSize' and @profile='bell' and @scale='2'][1]"/>
+
+  <replace sel="//create_factory[.//select[@ware='$LowtechWare']]/safepos[@x and @y and @z and contains(@x,'$SectorCentre.x') and @y='$Y' and contains(@z,'$SectorCentre.z')]">
+    <safepos value="$Position" includeplotbox="true"/>
+  </replace>
+
+  <!-- 3) Build-station subgoal: replace wide get_safe_pos with (sphere pick → local nudge that preserves intent) -->
+  <add
+    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$Target' and @max='100km'][1]"
+    pos="before">
+    <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$NewSubgoalTable.$Position">
+      <param name="center" value="$NewSubgoalTable.$Target.coreposition"/>
+      <param name="R"      value="[$NewSubgoalTable.$Target.coresize / 2.0f, 600km].min"/>
+      <param name="squash" value="0.60f"/>
+    </run_actions>
+  </add>
+  <replace
+    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$Target' and @max='100km'][1]">
+    <get_safe_pos result="$NewSubgoalTable.$Position"
+                  sector="$NewSubgoalTable.$Target"
+                  value="$NewSubgoalTable.$Position"
+                  radius="5km"
+                  comment="position of new to build station"/>
+  </replace>
+
+</diff>

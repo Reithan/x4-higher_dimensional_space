@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+    <!-- 1) ZONE-BASED: replace local random offset with our sphere RNG (no center; acts as offset) -->
+    <replace
+        sel="//library[@name='Find_Location_And_Build_Station']//do_if[@value='$SpawnZone']/create_position[@name='$Position']">
+        <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+            <param name="R" value="40km" />
+            <param name="squash" value="1.0f" />
+        </run_actions>
+    </replace>
+    <remove
+        sel="//library[@name='Find_Location_And_Build_Station']//do_if[@value='$SpawnZone']/set_value[@name='$Y_Position']" />
+    <remove
+        sel="//library[@name='Find_Location_And_Build_Station']//do_if[@value='$SpawnZone']/set_value[@name='$Position' and contains(@exact,'$Y_Position')]" />
+
+    <!-- 2) CORE FALLBACK: replace GetRandomCorePosition_1 with sphere RNG about sector core -->
+    <replace
+        sel="//library[@name='Find_Location_And_Build_Station']//include_actions[@ref='GetRandomCorePosition_1']">
+        <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$Position">
+            <param name="center" value="$ChosenSector.coreposition" />
+            <param name="R" value="[$ChosenSector.coresize / 2.0f, 600km].min" />
+            <param name="squash" value="0.60" />
+        </run_actions>
+    </replace>
+</diff>
