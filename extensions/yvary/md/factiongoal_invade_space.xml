@@ -2,9 +2,7 @@
 <diff>
 
   <!-- A) Prepare phase → BuildStation (no fixed Z) -->
-  <add
-    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and not(@z)][1]"
-    pos="before">
+  <add sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and not(@z)][1]" pos="before">
     <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$SpherePos">
       <param name="center" value="$NewSubgoalTable.$EntryPoint.destination"/>
       <param name="R"      value="10km"/>
@@ -12,8 +10,7 @@
     </run_actions>
   </add>
 
-  <replace
-    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and not(@z)][1]">
+  <replace sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and not(@z)][1]">
     <get_safe_pos result="$NewSubgoalTable.$Position"
                   sector="$NewSubgoalTable.$Target"
                   value="$SpherePos"
@@ -22,9 +19,8 @@
   </replace>
 
   <!-- B) Beachhead phase → BuildStation (preserve z='5km') -->
-  <add
-    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and @z='5km'][1]"
-    pos="before">
+  <!--Try patching vanilla and Faction Fix modded-->
+  <add sel="(//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and @z='5km']|//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @x='this.$GatePos.x + sin(this.$RandYaw) * this.$PlacementDist' and @y='this.$GatePos.y + this.$YOffset' and @z='this.$GatePos.z + cos(this.$RandYaw) * this.$PlacementDist' and @includeplotbox='true'])[1]" pos="before">
     <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$SpherePos">
       <param name="center" value="$NewSubgoalTable.$EntryPoint.destination"/>
       <param name="R"      value="10km"/>
@@ -32,8 +28,7 @@
     </run_actions>
   </add>
 
-  <replace
-    sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and @z='5km'][1]">
+  <replace sel="(//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and @z='5km']|//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @x='this.$GatePos.x + sin(this.$RandYaw) * this.$PlacementDist' and @y='this.$GatePos.y + this.$YOffset' and @z='this.$GatePos.z + cos(this.$RandYaw) * this.$PlacementDist' and @includeplotbox='true'])[1]">
     <get_safe_pos result="$NewSubgoalTable.$Position"
                   sector="$NewSubgoalTable.$Target"
                   value="$SpherePos"
