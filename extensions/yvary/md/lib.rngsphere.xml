@@ -8,7 +8,7 @@
             - center (position) OR (cx,cy,cz) lengths (center wins if given)
             - Rmin (length) : minimum distance to offset  from center position
             - R (length) : sphere radius
-            - squashPercent (float, default 100): 100 = no squash; 0 = fully flattened (min 0.0001%)
+            - squash (float, default 1.0f): 1.0f = no squash; 0.0f = fully flattened
          Outputs (in caller scope): $out_x, $out_y, $out_z, $out_pos
         -->
         <library name="HDS_RNG_Sphere_RandPoint" purpose="run_actions">
@@ -19,7 +19,7 @@
                 <param name="cz" default="0" />
                 <param name="Rmin" default="0" />
                 <param name="R" />
-                <param name="squashPercent" default="100" />
+                <param name="squash" default="1.0f" />
             </params>
 
             <actions>
@@ -30,51 +30,35 @@
                     <set_value name="$cz" exact="$center.z" />
                 </do_if>
 
-                <!-- q = max(squashPercent, 0.0001) / 100.0 -->
-                <set_value name="$sp" exact="$squashPercent" />
-                <do_if value="$sp lt 0.0001">
-                    <set_value name="$sp" exact="0.0001" />
-                </do_if>
-                <set_value name="$q" exact="$sp / 100.0" />
-
                 <!-- radius fraction s in [0,1], mixed uniform/averaged bias -->
-                <set_value name="$coin" exact="[0.0,1.0].randominrange" />
-                <do_if value="$coin lt 0.5">
-                    <set_value name="$s" exact="[0.0,1.0].randominrange" />
+                <do_if value="true" chance="50">
+                    <set_value name="$sum" exact="[0.0,1.0].randominrange" />
                 </do_if>
                 <do_else>
                     <set_value name="$sum" exact="0.0" />
                     <set_value name="$k" exact="0" />
-                    <do_while value="$k lt 5">
+                    <do_all exact="5" counter="$idx">
                         <set_value name="$k" exact="$k + 1" />
                         <set_value name="$sum" operation="add" exact="[0.0,0.2].randominrange" />
-                    </do_while>
+                    </do_all>
                 </do_else>
                 <set_value name="$r" exact="(($R - $Rmin) * $sum) + $Rmin" />
 
                 <!-- random direction, uniform on sphere -->
                 <set_value name="$pi" exact="3.141592653589793" />
-                <set_value name="$u" exact="2.0 * [0.0,1.0].randominrange - 1.0" />        <!-- cos(theta) ~
-                U(-1,1) -->
+                <set_value name="$u" exact="2.0 * [0.0,1.0].randominrange - 1.0" />        <!-- cos(theta) ~U(-1,1) -->
                 <set_value name="$phi" exact="2.0 * $pi * [0.0,1.0].randominrange" />
                 <set_value name="$t" exact="sqrt(1.0 - $u*$u)" />
                 <set_value name="$dirx" exact="$t * cos($phi)" />
                 <set_value name="$diry" exact="$u" />
                 <set_value name="$dirz" exact="$t * sin($phi)" />
 
-                <!-- point before squash -->
-                <set_value name="$x" exact="$cx + $r * $dirx" />
-                <set_value name="$y" exact="$cy + $r * $diry" />
-                <set_value name="$z" exact="$cz + $r * $dirz" />
+                <set_value name="$x" exact="$cx + ($r * $dirx)" />
+                <set_value name="$y" exact="$cy + ($r * $diry * $squash)" />
+                <set_value name="$z" exact="$cz + ($r * $dirz)" />
 
-                <!-- squash/stretch along +Y (100% => none) -->
-                <set_value name="$y" exact="$cy + ($y - $cy) * $q" />
-
-                <!-- outputs -->
-                <set_value name="$out_x" exact="$x" />
-                <set_value name="$out_y" exact="$y" />
-                <set_value name="$out_z" exact="$z" />
-                <set_value name="$out_pos" exact="position.[$x, $y, $z]" />
+                <!-- output -->
+                <return value="position.[$x, $y, $z]" />
             </actions>
         </library>
 

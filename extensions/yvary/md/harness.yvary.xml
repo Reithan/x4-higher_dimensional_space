@@ -34,25 +34,18 @@
                 </do_if>
 
 
-                <!-- center = sector.coreposition (fallback to 0,0 if absent) -->
-                <set_value name="$coreX" exact="0" />
+                <!-- center = sector.coreposition (fallback to 0,0,0 if absent) -->
+                <set_value name="$corePos" exact="position.[0,0,0]" />
                 <do_if value="$sec.coreposition?">
-                    <set_value name="$coreX" exact="$sec.coreposition.x" />
-                </do_if>
-                <set_value name="$coreZ" exact="0" />
-                <do_if value="$sec.coreposition?">
-                    <set_value name="$coreZ" exact="$sec.coreposition.z" />
+                    <set_value name="$corePos" exact="$sec.coreposition" />
                 </do_if>
 
                 <set_value name="$p" exact="player.entity" />
                 <set_value name="$sec" exact="$p.sector" />
-                <set_value name="$hx" exact="$coreX" />
-                <set_value name="$hy" exact="0" />
-                <set_value name="$hz" exact="$coreZ" />
 
                 <create_object name="$anchor" macro="macro.env_deco_nav_beacon_t1_macro"
                     owner="faction.player" sector="$sec">
-                    <position x="$hx" y="$hy" z="$hz" />
+                    <position value="$corePos" />
                 </create_object>
                 <set_known object="$anchor" known="true" />
                 <set_value name="$HDS_dev_anchor" exact="$anchor" />
@@ -187,22 +180,6 @@
                             <set_value name="$yPos" exact="$fixedY" />
                             <set_value name="$zPos" exact="$fixedZ" />
 
-                            <!-- (Temporarily skip varyY for visual validation)
-            <run_actions ref="md.hds_yvary_lib.HDSYV_VaryY">
-                <param name="x"          value="$xPos"/>
-                <param name="y"          value="$yPos"/>
-                <param name="z"          value="$zPos"/>
-                <param name="cx"         value="$centerX"/>
-                <param name="cz"         value="$centerZ"/>
-                <param name="R"          value="$radius"/>
-                <param name="margin"     value="$HDS_dev_margin"/>
-                <param name="q"          value="$HDS_dev_q"/>
-                <param name="absolute"   value="$HDS_dev_absolute"/>
-                <param name="save_seed"  value="0"/>
-                <param name="obj_key"    value="$idx"/>
-            </run_actions>
-            -->
-
                             <!-- Place the beacon at the exact test position (units: engine treats
                             lengths as meters; explicit km OK too) -->
                             <create_object name="$beacon" macro="macro.env_deco_nav_beacon_t1_macro"
@@ -236,13 +213,9 @@
                         <set_value name="$sector" exact="player.entity.sector" />
 
                         <!-- Core center; fall back to (0, 0) if unknown -->
-                        <set_value name="$centerX" exact="0" />
+                        <set_value name="$center" exact="position.[0,0,0]" />
                         <do_if value="$sector.coreposition?">
-                            <set_value name="$centerX" exact="$sector.coreposition.x" />
-                        </do_if>
-                        <set_value name="$centerZ" exact="0" />
-                        <do_if value="$sector.coreposition?">
-                            <set_value name="$centerZ" exact="$sector.coreposition.z" />
+                            <set_value name="$center" exact="$sector.coreposition" />
                         </do_if>
 
                         <!-- Core diameter → radius; fall back to harness default if missing or <= 0 -->
@@ -273,22 +246,21 @@
                         <!-- Sample & spawn -->
                         <do_all exact="$count" counter="$idx">
                             <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$pos">
-                                <param name="center" value="position.[$centerX, 0, $centerZ]" />
+                                <param name="center" value="$center" />
                                 <param name="R" value="$radius" />
-                                <param name="squash" value="0.60" />
+                                <param name="squash" value="0.60f" />
                             </run_actions>
 
                             <create_object name="$b" macro="macro.env_deco_nav_beacon_t1_macro"
                                 owner="faction.player" sector="$sector">
-                                <safepos value="$pos" allowyaxis="true" radius="1km"
-                                    includeplotbox="true" />
+                                <safepos value="$pos" allowyaxis="true" radius="1km" />
                             </create_object>
                             <set_known object="$b" known="true" />
                             <append_to_list name="$HDS_dev_markers" exact="$b" />
                         </do_all>
 
                         <debug_text
-                            text="'[HDS] Cloud: ' + $count + ' beacons; center=(' + $centerX + ',' + $centerZ + '), R=' + $radius + ', squash=0.60'" />
+                            text="'[HDS] Cloud: ' + $count + ' beacons; center=(' + $center.x + ',' + $center.y + ',' + $center.z + '), R=' + $radius + ', squash=0.60f'" />
                     </actions>
                 </cue>
 
