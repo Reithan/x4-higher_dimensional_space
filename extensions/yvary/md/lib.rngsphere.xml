@@ -74,7 +74,7 @@
                 <set_value name="$out_x" exact="$x" />
                 <set_value name="$out_y" exact="$y" />
                 <set_value name="$out_z" exact="$z" />
-                <set_value name="$out_pos" exact="position[$x, $y, $z]" />
+                <set_value name="$out_pos" exact="position.[$x, $y, $z]" />
             </actions>
         </library>
 
