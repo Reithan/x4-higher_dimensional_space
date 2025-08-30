@@ -1,4 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
-<content id="higher_dimensional_space" name="Higher Dimensional Space" version="0.1.0" author="Reithan" date="2025-08-26" save="false">
-  <text language="44" name="Higher Dimensional Space" description="Expands station distribution across Y-axis for more variety in NPC station/plot placements. Space is 3D!" />
+<content id="ws_3558679669" name="Higher Dimensional Space" version="010" author="Reithan" date="2025-08-30" save="false" description="Expands station distribution across Y-axis for more variety in NPC station/plot placements. Space is 3D!" sync="false" lastupdate="1756544778">
 </content>
