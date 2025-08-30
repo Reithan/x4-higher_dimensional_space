@@ -58,6 +58,7 @@
                 <set_value name="$z" exact="$cz + ($r * $dirz)" />
 
                 <!-- output -->
+                 <debug_text text="'[HDS] Generated RNG Sphere point ' + position.[$x, $y, $z]" />
                 <return value="position.[$x, $y, $z]" />
             </actions>
         </library>
