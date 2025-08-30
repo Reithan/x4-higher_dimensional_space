@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+    <replace sel="/god/stations/defaults/location/@coreboundaryzoneheight">360000</replace>
+    <add sel="/god/products" pos="prepend">
+        <defaults>
+            <location newzonechance="0.5" coreboundaryzoneheight="360000">
+                <corerange max="1.3"/>
+                <region allowhazardous="false" allowgravidar="true"/>
+            </location>
+            <modules production="5" storage="10" />
+            <quota zone="3" sector="30" />
+        </defaults>
+    </add>
+</diff>

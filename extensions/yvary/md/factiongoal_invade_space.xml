@@ -4,7 +4,7 @@
   <!-- A) Prepare phase → BuildStation (no fixed Z) -->
   <add sel="//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and not(@z)][1]" pos="before">
     <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$SpherePos">
-      <param name="center" value="$NewSubgoalTable.$EntryPoint.destination"/>
+      <param name="center" value="$NewSubgoalTable.$EntryPoint.destination.position"/>
       <param name="R"      value="10km"/>
       <param name="squash" value="1.0f"/>
     </run_actions>
@@ -22,7 +22,7 @@
   <!--Try patching vanilla and Faction Fix modded-->
   <add sel="(//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @object='$NewSubgoalTable.$EntryPoint.destination' and @max='10km' and @z='5km']|//get_safe_pos[@result='$NewSubgoalTable.$Position' and @sector='$NewSubgoalTable.$Target' and @radius='5km' and @x='this.$GatePos.x + sin(this.$RandYaw) * this.$PlacementDist' and @y='this.$GatePos.y + this.$YOffset' and @z='this.$GatePos.z + cos(this.$RandYaw) * this.$PlacementDist' and @includeplotbox='true'])[1]" pos="before">
     <run_actions ref="md.hds_rng_sphere_lib.HDS_RNG_Sphere_RandPoint" result="$SpherePos">
-      <param name="center" value="$NewSubgoalTable.$EntryPoint.destination"/>
+      <param name="center" value="$NewSubgoalTable.$EntryPoint.destination.position"/>
       <param name="R"      value="10km"/>
       <param name="squash" value="1.0f"/>
     </run_actions>
