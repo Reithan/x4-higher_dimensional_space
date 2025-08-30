@@ -24,7 +24,7 @@
                 <set_value name="$SecCenter" exact="$Sector.coreposition"/>
                 <set_value name="$SecRadius" exact="$Sector.coresize / 2.0f"/>
                 <set_value name="$FlatOffset" exact="position.[$StationPos.x - $SecCenter.x, 0.0, $StationPos.z - $SecCenter.z]" />
-                <set_value name="$SphereHeightSq" exact="((1.3f* $SecRadius) ^ 2) - ($FlatOffset.x ^ 2) - ($FlatOffset.z ^ 2)" />
+                <set_value name="$SphereHeightSq" exact="((1.3f* $SecRadius) ^ 2) - ($FlatOffset.x ^ 2) - ($FlatOffset.z ^ 2)" /> <!-- GOD default is 1.3x radius -->
                 <set_value name="$SphereHeight" exact="[sqrt([$SphereHeightSq, 0.0f].max), 10000.0f].max" /> <!-- Avoid neg sqrt from stations outside default core radius, min 10km-->
 
                 <!-- radius fraction s in [0,1], mixed uniform/averaged bias -->
@@ -39,7 +39,7 @@
                         <set_value name="$sum" operation="add" exact="[0.0,0.2].randominrange" />
                     </do_all>
                 </do_else>
-                <set_value name="$sum" exact="$sum * 0.6f" /> <!-- 60% squashed -->
+                <set_value name="$sum" exact="$sum * 0.4615f" /> <!-- 130% expanded -> ~60% squashed -->
                 <set_value name="$sum" exact="$sum * -1.0f" chance="50" /> <!-- 50% negative -->
 
                 <set_value name="$StationDest" exact="position.[$StationPos.x, $SecCenter.y + ($sum * $SphereHeight), $StationPos.z]" />
