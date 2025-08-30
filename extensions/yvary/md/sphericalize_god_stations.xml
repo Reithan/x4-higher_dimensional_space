@@ -33,9 +33,7 @@
                 </do_if>
                 <do_else>
                     <set_value name="$sum" exact="0.0" />
-                    <set_value name="$k" exact="0" />
                     <do_all exact="5" counter="$idx">
-                        <set_value name="$k" exact="$k + 1" />
                         <set_value name="$sum" operation="add" exact="[0.0,0.2].randominrange" />
                     </do_all>
                 </do_else>
