@@ -5,8 +5,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $modCandidates = @(
-  (Join-Path $repoRoot 'extensions\yvary'),
-  (Join-Path $repoRoot 'extensions\hds_yvary')
+  (Join-Path $repoRoot 'extensions\higher_dimensional_space')
 )
 $localMod = $null
 foreach ($p in $modCandidates) { if (Test-Path $p) { $localMod = $p; break } }
